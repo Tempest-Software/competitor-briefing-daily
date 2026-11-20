@@ -1,0 +1,8 @@
+.env
+node_modules/
+function.zip
+.claude/
+.DS_Store
+# Managed Agents experiment, not part of the Lambda
+agents/
+claude-lock.json

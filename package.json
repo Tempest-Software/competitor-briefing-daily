@@ -1,0 +1,16 @@
+{
+  "name": "competitor-brief",
+  "version": "1.0.0",
+  "type": "module",
+  "description": "Daily competitor briefing: Claude web research -> Google Doc in the ai-briefings shared drive (APP-739)",
+  "main": "index.js",
+  "scripts": {
+    "test": "node test.js",
+    "brief": "node --env-file-if-exists=.env test.js brief",
+    "upload": "node --env-file=.env test.js upload"
+  },
+  "dependencies": {
+    "@anthropic-ai/sdk": "^1.10.0",
+    "googleapis": "^144.0.0"
+  }
+}
