@@ -2,7 +2,7 @@
   "name": "competitor-brief",
   "version": "1.0.0",
   "type": "module",
-  "description": "Daily competitor briefing: Claude web research -> Google Doc in the ai-briefings shared drive (APP-739)",
+  "description": "Daily competitor briefing: Claude web research -> Google Doc in the ai-briefings shared drive",
   "main": "index.js",
   "scripts": {
     "test": "node test.js",

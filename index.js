@@ -1,22 +1,12 @@
-// Competitor Briefing Daily Report (APP-739).
-// EventBridge -> this Lambda -> Claude (web search + fetch) -> Google Doc in the ai-briefings shared drive.
-//
-// Env vars:
-//   ANTHROPIC_API_KEY   Claude API key
-//   GOOGLE_SA_JSON      service account key JSON (the account must be Contributor on the shared drive)
-//   GDRIVE_FOLDER_ID    ID of the `competitor` folder
-//   BRIEF_MODEL         optional, defaults to claude-opus-5-5
 import { readFileSync } from "node:fs";
 import Anthropic from "@anthropic-ai/sdk";
 import { google } from "googleapis";
 
 const PROMPT = readFileSync(new URL("./prompt.md", import.meta.url), "utf8");
 
-// "November 18, 2026" in Eastern time, whatever timezone Lambda runs in.
 export const dateLabel = (d = new Date()) =>
   d.toLocaleDateString("en-US", { timeZone: "America/New_York", month: "long", day: "numeric", year: "numeric" });
 
-// Same-day rule from Eddie's task: first doc keeps the base title, reruns get " (2)", " (3)", ...
 export function nextTitle(base, existingNames) {
   const taken = new Set(existingNames);
   if (!taken.has(base)) return base;
@@ -41,7 +31,7 @@ export async function research(today = dateLabel()) {
   const client = new Anthropic();
   const messages = [{ role: "user", content: `Run today's competitor brief. Today is ${today}.` }];
   const usage = {};
-  // Server-side tools run in Anthropic's loop; a long turn comes back as pause_turn and is resumed by resending.
+  // A long server-side tool turn comes back as pause_turn and is resumed by resending.
   for (let turn = 0; turn < 8; turn++) {
     const message = await client.beta.messages
       .stream({
@@ -77,8 +67,6 @@ export async function research(today = dateLabel()) {
   throw new Error("Claude was still paused after 8 turns");
 }
 
-// Uploads HTML and lets Drive convert it to a Google Doc. Unlike the Zendesk digest, the doc is
-// the only output here, so a Drive failure fails the run.
 export async function saveDoc(baseTitle, html) {
   const auth = new google.auth.GoogleAuth({
     credentials: JSON.parse(process.env.GOOGLE_SA_JSON),

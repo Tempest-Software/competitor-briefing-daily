@@ -1,6 +1,3 @@
-// npm test         -> offline checks of the title and extraction logic
-// npm run brief    -> real Claude run, prints the HTML brief, no Drive upload (about $1)
-// npm run upload   -> real run plus Drive upload (needs GOOGLE_SA_JSON and GDRIVE_FOLDER_ID in .env)
 import assert from "node:assert/strict";
 import { nextTitle, extractBrief, research, handler } from "./index.js";
 

@@ -1,6 +1,6 @@
 # Competitor Briefing Daily
 
-A Lambda that has Claude research competitor news each morning and saves a dated Google Doc to the `competitor` folder of the `ai-briefings` shared drive. Linear: [APP-739](https://linear.app/wft/issue/APP-739/competitor-briefing-daily-report).
+A Lambda that has Claude research competitor news each morning and saves a dated Google Doc to the `competitor` folder of the `ai-briefings` shared drive.
 
 - `index.js`: Claude API call (web search + fetch), then the Drive upload
 - `prompt.md`: what the brief covers; edit this to change it
