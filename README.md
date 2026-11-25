@@ -7,7 +7,7 @@ A Lambda that has Claude research competitor news each morning and saves a dated
 
 ## Run locally
 
-Put `ANTHROPIC_API_KEY`, `GOOGLE_SA_JSON` and `GDRIVE_FOLDER_ID` in `.env`.
+`ANTHROPIC_API_KEY`, `GOOGLE_SA_JSON` and `GDRIVE_FOLDER_ID` are read from Parameter Store under `/competitor-briefing/`. Any of them set in the environment or `.env` wins.
 
 ```sh
 npm install

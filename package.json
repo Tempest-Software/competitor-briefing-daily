@@ -7,10 +7,10 @@
   "scripts": {
     "test": "node test.js",
     "brief": "node --env-file-if-exists=.env test.js brief",
-    "upload": "node --env-file=.env test.js upload"
+    "upload": "node --env-file-if-exists=.env test.js upload"
   },
   "dependencies": {
     "@anthropic-ai/sdk": "^1.10.0",
-    "googleapis": "^144.0.0"
+    "@googleapis/drive": "^27.1.0"
   }
 }

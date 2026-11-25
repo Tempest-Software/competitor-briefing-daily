@@ -1,8 +1,28 @@
 import { readFileSync } from "node:fs";
 import Anthropic from "@anthropic-ai/sdk";
-import { google } from "googleapis";
+import { auth as googleAuth, drive as googleDrive } from "@googleapis/drive";
 
 const PROMPT = readFileSync(new URL("./prompt.md", import.meta.url), "utf8");
+const PARAMETER_PATH = "/competitor-briefing/";
+const REQUIRED_SETTINGS = ["ANTHROPIC_API_KEY", "GOOGLE_SA_JSON", "GDRIVE_FOLDER_ID"];
+
+export async function loadSettings() {
+  const missingSettings = REQUIRED_SETTINGS.filter((name) => !process.env[name]);
+  if (missingSettings.length === 0) return;
+
+  const { SSMClient, GetParametersCommand } = await import("@aws-sdk/client-ssm");
+  const { Parameters, InvalidParameters } = await new SSMClient().send(
+    new GetParametersCommand({
+      Names: missingSettings.map((name) => PARAMETER_PATH + name),
+      WithDecryption: true,
+    })
+  );
+  if (InvalidParameters.length > 0) throw new Error(`Not found in Parameter Store: ${InvalidParameters.join(", ")}`);
+
+  for (const parameter of Parameters) {
+    process.env[parameter.Name.slice(PARAMETER_PATH.length)] = parameter.Value;
+  }
+}
 
 export const dateLabel = (d = new Date()) =>
   d.toLocaleDateString("en-US", { timeZone: "America/New_York", month: "long", day: "numeric", year: "numeric" });
@@ -28,6 +48,7 @@ export function extractBrief(content) {
 }
 
 export async function research(today = dateLabel()) {
+  await loadSettings();
   const client = new Anthropic();
   const messages = [{ role: "user", content: `Run today's competitor brief. Today is ${today}.` }];
   const usage = {};
@@ -68,11 +89,12 @@ export async function research(today = dateLabel()) {
 }
 
 export async function saveDoc(baseTitle, html) {
-  const auth = new google.auth.GoogleAuth({
+  await loadSettings();
+  const auth = new googleAuth.GoogleAuth({
     credentials: JSON.parse(process.env.GOOGLE_SA_JSON),
     scopes: ["https://www.googleapis.com/auth/drive"],
   });
-  const drive = google.drive({ version: "v3", auth });
+  const drive = googleDrive({ version: "v3", auth });
   const folder = process.env.GDRIVE_FOLDER_ID;
   const { data: list } = await drive.files.list({
     q: `'${folder}' in parents and trashed = false and name contains '${baseTitle.replace(/'/g, "\\'")}'`,
